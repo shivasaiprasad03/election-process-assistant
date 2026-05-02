@@ -4,8 +4,8 @@ export default defineConfig({
   root: '.',
   publicDir: 'public',
   build: {
+    minify: 'esbuild',
     outDir: 'dist',
-    minify: 'terser',
     sourcemap: false,
     rollupOptions: {
       output: {
