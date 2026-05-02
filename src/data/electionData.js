@@ -1,0 +1,258 @@
+/** Election Process Data — 7 Stages of Indian Elections */
+export const electionSteps = [
+  {
+    id: 1,
+    title: 'Delimitation & Electoral Rolls',
+    icon: '📋',
+    duration: 'Ongoing process',
+    shortDesc: 'Drawing constituency boundaries and registering voters.',
+    description: 'The Election Commission of India (ECI) oversees the delimitation of constituencies and maintenance of electoral rolls. Every citizen aged 18+ can register as a voter.',
+    details: [
+      'Delimitation Commission redraws constituency boundaries based on census data.',
+      'Electoral rolls are updated continuously — you can register online via NVSP portal.',
+      'Photo voter ID cards (EPIC) are issued to all registered voters.',
+      'Special drives are conducted before major elections to maximize enrollment.',
+    ],
+    facts: [
+      { label: 'Total Voters (2024)', value: '~968 million' },
+      { label: 'Lok Sabha Seats', value: '543' },
+      { label: 'Minimum Voting Age', value: '18 years' },
+    ],
+    tips: ['Check your voter registration status at nvsp.in', 'You can register online — no need to visit an office'],
+    color: '#FF6B35',
+  },
+  {
+    id: 2,
+    title: 'Election Announcement',
+    icon: '📢',
+    duration: '~45 days before polling',
+    shortDesc: 'ECI announces election schedule and Model Code of Conduct kicks in.',
+    description: 'The Election Commission announces the election schedule, and the Model Code of Conduct (MCC) comes into immediate effect, regulating the behavior of political parties and the government.',
+    details: [
+      'ECI issues a press conference announcing dates for nominations, polling, and counting.',
+      'Model Code of Conduct prevents ruling parties from using government resources for campaigns.',
+      'All government advertisements (except disaster-related) are halted.',
+      'Transfer of officials who may influence elections is conducted.',
+    ],
+    facts: [
+      { label: 'MCC Duration', value: '~2 months' },
+      { label: 'Announcement', value: 'Press conference by CEC' },
+      { label: 'Phases', value: 'Usually 1-7 phases' },
+    ],
+    tips: ['MCC applies equally to ruling and opposition parties', 'Citizens can report MCC violations via cVIGIL app'],
+    color: '#3b82f6',
+  },
+  {
+    id: 3,
+    title: 'Nomination of Candidates',
+    icon: '📝',
+    duration: '~2 weeks',
+    shortDesc: 'Candidates file nominations, face scrutiny, and can withdraw.',
+    description: 'Aspiring candidates file their nomination papers with the Returning Officer. Papers are scrutinized for eligibility, and candidates have a window to withdraw.',
+    details: [
+      'Candidates must be Indian citizens, registered voters, and meet age requirements (25 for Lok Sabha).',
+      'A security deposit of ₹25,000 (₹12,500 for SC/ST) must be paid.',
+      'Nomination papers are scrutinized for validity.',
+      'After scrutiny, candidates have 2 days to withdraw their nominations.',
+      'Final list of contesting candidates is published.',
+    ],
+    facts: [
+      { label: 'Security Deposit', value: '₹25,000' },
+      { label: 'Min Age (Lok Sabha)', value: '25 years' },
+      { label: 'Withdrawal Window', value: '2 days after scrutiny' },
+    ],
+    tips: ['Independent candidates can also contest elections', 'Convicted persons are barred from contesting'],
+    color: '#8b5cf6',
+  },
+  {
+    id: 4,
+    title: 'Election Campaigning',
+    icon: '📣',
+    duration: '~2-3 weeks',
+    shortDesc: 'Political parties campaign following strict rules and spending limits.',
+    description: 'Parties and candidates campaign to win voter support. Campaigning must follow strict guidelines, including spending limits and a campaign silence period 48 hours before polling.',
+    details: [
+      'Candidates have spending limits (₹95 lakh for Lok Sabha in most states).',
+      'Campaigning must stop 48 hours before polling day ("silence period").',
+      'No appeals based on religion, caste, or communal feelings.',
+      'Use of government vehicles and resources for campaigning is prohibited.',
+      'All campaign expenditures must be accounted for and reported.',
+    ],
+    facts: [
+      { label: 'Spending Limit', value: '₹95 lakh (Lok Sabha)' },
+      { label: 'Silence Period', value: '48 hours before polling' },
+      { label: 'Campaign Duration', value: '~14-20 days' },
+    ],
+    tips: ['Paid news is an election offense', 'Social media campaigns also have regulations'],
+    color: '#06b6d4',
+  },
+  {
+    id: 5,
+    title: 'Polling Day',
+    icon: '🗳️',
+    duration: '1 day per phase',
+    shortDesc: 'Voters cast their ballots using EVMs at designated polling stations.',
+    description: 'On polling day, registered voters visit their assigned polling stations to cast their vote using Electronic Voting Machines (EVMs) with VVPAT verification.',
+    details: [
+      'Polling hours are typically 7 AM to 6 PM.',
+      'Voters must carry a valid photo ID (Voter ID, Aadhaar, Passport, etc.).',
+      'Electronic Voting Machines (EVMs) are used — tamper-proof and battery-operated.',
+      'VVPAT (Voter Verifiable Paper Audit Trail) prints a slip for voter verification.',
+      'Indelible ink is applied on the left index finger to prevent duplicate voting.',
+      'NOTA (None of the Above) option is available.',
+    ],
+    facts: [
+      { label: 'EVMs Used (2024)', value: '~5.5 million' },
+      { label: 'Polling Stations (2024)', value: '~1.05 million' },
+      { label: 'Paid Holiday', value: 'Yes, for all voters' },
+    ],
+    tips: ['You can vote even if your name is missing — ask for Form 7', 'The VVPAT slip is visible for 7 seconds'],
+    color: '#10b981',
+  },
+  {
+    id: 6,
+    title: 'Counting & Results',
+    icon: '📊',
+    duration: '1 day (usually)',
+    shortDesc: 'Votes are counted and results declared constituency by constituency.',
+    description: 'After polling is complete, EVMs are stored securely until counting day. Votes are counted at designated counting centers under strict supervision.',
+    details: [
+      'Counting begins at 8 AM on the designated date.',
+      'Postal ballots are counted first.',
+      'EVM results are tallied round by round.',
+      'VVPAT slips of 5 randomly selected polling stations per constituency are matched with EVM counts.',
+      'Results are declared by the Returning Officer for each constituency.',
+      'Results are available in real-time on the ECI website.',
+    ],
+    facts: [
+      { label: 'VVPAT Verification', value: '5 per constituency' },
+      { label: 'Counting Duration', value: '~12-16 hours' },
+      { label: 'Margin for Recount', value: 'If requested by candidate' },
+    ],
+    tips: ['Track live results on results.eci.gov.in', 'Any candidate can request a recount'],
+    color: '#f59e0b',
+  },
+  {
+    id: 7,
+    title: 'Government Formation',
+    icon: '🏛️',
+    duration: '~2 weeks after results',
+    shortDesc: 'The winning party/coalition forms the government and takes oath.',
+    description: 'The party or coalition with a majority (272+ seats in Lok Sabha) is invited by the President to form the government. The Prime Minister and Council of Ministers take oath.',
+    details: [
+      'The President invites the leader of the majority party/coalition to form government.',
+      'The PM is sworn in at Rashtrapati Bhavan.',
+      'Council of Ministers is appointed and sworn in.',
+      'The new Lok Sabha is constituted and the first session begins.',
+      'A Speaker is elected from among the members.',
+      'The government presents its agenda and policies.',
+    ],
+    facts: [
+      { label: 'Majority Mark', value: '272 seats' },
+      { label: 'Total Lok Sabha Seats', value: '543' },
+      { label: 'Term Duration', value: '5 years' },
+    ],
+    tips: ['A coalition government is formed if no single party gets 272+ seats', 'Floor test proves majority in the House'],
+    color: '#ef4444',
+  },
+];
+
+/** Quiz Questions */
+export const quizQuestions = [
+  {
+    question: 'What is the minimum age to vote in Indian elections?',
+    options: ['16 years', '18 years', '21 years', '25 years'],
+    correct: 1,
+    explanation: 'The 61st Amendment Act of 1988 lowered the voting age from 21 to 18 years.',
+  },
+  {
+    question: 'What does EVM stand for?',
+    options: ['Electronic Verification Machine', 'Electronic Voting Machine', 'Electoral Vote Mechanism', 'Election Validity Monitor'],
+    correct: 1,
+    explanation: 'EVMs are Electronic Voting Machines used across India since 2004.',
+  },
+  {
+    question: 'How many seats are there in the Lok Sabha?',
+    options: ['500', '543', '545', '552'],
+    correct: 1,
+    explanation: 'Lok Sabha has 543 elected seats representing parliamentary constituencies.',
+  },
+  {
+    question: 'What is the "silence period" before polling?',
+    options: ['24 hours', '36 hours', '48 hours', '72 hours'],
+    correct: 2,
+    explanation: 'All campaigning must stop 48 hours before the polling day.',
+  },
+  {
+    question: 'What is NOTA?',
+    options: ['National Online Tracking App', 'None of the Above', 'New Order for Total Authority', 'National Organization for Transparent Admin'],
+    correct: 1,
+    explanation: 'NOTA allows voters to officially reject all candidates on the ballot.',
+  },
+  {
+    question: 'Which body conducts elections in India?',
+    options: ['Supreme Court', 'Parliament', 'Election Commission of India', 'President of India'],
+    correct: 2,
+    explanation: 'The ECI is an autonomous constitutional authority responsible for elections.',
+  },
+  {
+    question: 'What is VVPAT?',
+    options: ['Voter Verified Paper Audit Trail', 'Virtual Vote Processing & Tracking', 'Voter Validation Proof & Testing', 'Vote Verification Public Access Terminal'],
+    correct: 0,
+    explanation: 'VVPAT prints a paper slip of the vote cast, visible for 7 seconds for verification.',
+  },
+  {
+    question: 'How many seats are needed for a majority in Lok Sabha?',
+    options: ['250', '272', '300', '350'],
+    correct: 1,
+    explanation: 'A party needs 272 seats (50% + 1 of 543) to form the government.',
+  },
+  {
+    question: 'What is the security deposit for a Lok Sabha candidate?',
+    options: ['₹10,000', '₹25,000', '₹50,000', '₹1,00,000'],
+    correct: 1,
+    explanation: 'General category candidates must deposit ₹25,000; SC/ST candidates deposit ₹12,500.',
+  },
+  {
+    question: 'What prevents governments from misusing power during elections?',
+    options: ['Constitutional Amendment', 'Model Code of Conduct', 'Supreme Court Order', 'Parliamentary Resolution'],
+    correct: 1,
+    explanation: 'The MCC is a set of guidelines issued by ECI that comes into effect upon election announcement.',
+  },
+];
+
+/** FAQ Data */
+export const faqData = [
+  {
+    question: 'How do I check if I am registered to vote?',
+    answer: 'Visit the National Voters\' Service Portal (NVSP) at nvsp.in. You can search by name or EPIC (Voter ID) number. You can also check via the Voter Helpline App available on Android and iOS.',
+  },
+  {
+    question: 'I just turned 18. How do I register to vote?',
+    answer: 'You can register online through nvsp.in by filling Form 6. You\'ll need proof of age (birth certificate, school certificate) and proof of address. You can also visit your local Electoral Registration Office.',
+  },
+  {
+    question: 'What ID do I need to carry on polling day?',
+    answer: 'Your Voter ID (EPIC) is the primary ID. However, you can also use: Aadhaar card, Passport, Driving License, PAN card, or any government-issued photo ID. Carry at least one.',
+  },
+  {
+    question: 'Can I vote if my name is not on the voter list?',
+    answer: 'If your name is missing from the electoral roll, you may not be able to vote in that election. However, you can file a complaint and request inclusion for future elections using Form 6.',
+  },
+  {
+    question: 'What is the NOTA option and does it affect results?',
+    answer: 'NOTA (None of the Above) lets you reject all candidates. While it doesn\'t affect the election result (the candidate with most votes still wins), a high NOTA count sends a strong message about voter dissatisfaction.',
+  },
+  {
+    question: 'Is voting compulsory in India?',
+    answer: 'No, voting is a right, not a legal obligation at the national level. However, some states like Gujarat have provisions for compulsory voting in local body elections.',
+  },
+  {
+    question: 'How does the EVM work?',
+    answer: 'The EVM has two units: the Control Unit (with the polling officer) and the Ballot Unit (in the voting compartment). You press the button next to your chosen candidate. The VVPAT attached to it displays a printed slip for 7 seconds for verification.',
+  },
+  {
+    question: 'Can NRIs vote in Indian elections?',
+    answer: 'Yes! NRIs can vote in person at their registered constituency. They need to register as an overseas elector using Form 6A on the NVSP portal. Proxy voting for NRIs has been proposed but is not yet implemented.',
+  },
+];

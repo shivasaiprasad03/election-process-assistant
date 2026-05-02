@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="An interactive guide to understanding the Indian election process — from voter registration to government formation. Powered by AI." />
+  <meta name="keywords" content="Indian elections, voting process, democracy, election guide, Lok Sabha, ECI" />
+  <meta name="author" content="Election Process Assistant" />
+  <meta name="theme-color" content="#0f172a" />
+
+  <title>Election Process Assistant — Understand Your Vote</title>
+
+  <!-- Preconnect to Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Structured Data (JSON-LD) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Election Process Assistant",
+    "description": "An interactive guide to understanding the Indian election process",
+    "url": "https://election-assistant.example.com",
+    "applicationCategory": "EducationalApplication",
+    "operatingSystem": "Web",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "INR"
+    }
+  }
+  </script>
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="/src/styles/index.css" />
+  <link rel="stylesheet" href="/src/styles/components.css" />
+  <link rel="stylesheet" href="/src/styles/animations.css" />
+</head>
+<body>
+  <!-- Skip to Content (Accessibility) -->
+  <a href="#main-content" class="skip-link" id="skip-link">Skip to main content</a>
+
+  <!-- App Root -->
+  <div id="app">
+    <!-- Header will be injected here -->
+    <header id="header-root"></header>
+
+    <!-- Main Content -->
+    <main id="main-content" role="main">
+      <!-- Hero Section -->
+      <section id="hero-root"></section>
+
+      <!-- Timeline Section -->
+      <section id="timeline-root"></section>
+
+      <!-- Step Detail Modal -->
+      <div id="step-detail-root"></div>
+
+      <!-- Quiz Section -->
+      <section id="quiz-root"></section>
+
+      <!-- Map Explorer Section -->
+      <section id="map-root"></section>
+
+      <!-- FAQ Section -->
+      <section id="faq-root"></section>
+    </main>
+
+    <!-- Footer -->
+    <footer id="footer-root"></footer>
+
+    <!-- Chatbot Widget (floating) -->
+    <div id="chatbot-root"></div>
+  </div>
+
+  <!-- ARIA Live Region for dynamic announcements -->
+  <div id="aria-live" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+
+  <!-- App Entry Point -->
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>

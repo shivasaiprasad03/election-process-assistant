@@ -1,0 +1,33 @@
+{
+  "name": "election-process-assistant",
+  "version": "1.0.0",
+  "description": "An interactive assistant that helps users understand the election process, timelines, and steps",
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently \"vite\" \"node server/server.js\"",
+    "dev:client": "vite",
+    "dev:server": "node server/server.js",
+    "build": "vite build",
+    "preview": "vite preview",
+    "start": "node server/server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
+    "helmet": "^8.0.0",
+    "dompurify": "^3.2.4"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2",
+    "vite": "^6.3.4"
+  },
+  "keywords": [
+    "election",
+    "democracy",
+    "voting",
+    "india",
+    "civic-education",
+    "interactive"
+  ],
+  "license": "MIT"
+}
