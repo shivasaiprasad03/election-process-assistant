@@ -1,13 +1,25 @@
 /**
  * Footer Component
- * Links to official resources, disclaimer, and social sharing
+ * Links to official resources, disclaimer, Google Maps embed,
+ * and social sharing. Provides quick navigation and helpful external links.
+ *
+ * @module components/Footer
  */
 
+/**
+ * Initialize and mount the Footer component into #footer-root.
+ * Includes brand info, quick links, official resources,
+ * Google Maps embed of ECI headquarters, and disclaimer.
+ *
+ * @returns {void}
+ */
 export function initFooter() {
   const root = document.getElementById('footer-root');
   if (!root) return;
 
   root.className = 'footer';
+  root.setAttribute('role', 'contentinfo');
+
   root.innerHTML = `
     <div class="container">
       <div class="footer-grid">
@@ -46,19 +58,37 @@ export function initFooter() {
           </ul>
         </div>
       </div>
+
+      <!-- Google Maps Embed — ECI Headquarters -->
+      <div class="footer-map" role="region" aria-label="Election Commission of India headquarters location">
+        <h4 class="footer-map-title">📍 Election Commission of India — Headquarters</h4>
+        <iframe
+          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3501.8990417354025!2d77.20659261508!3d28.63134338241!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390cfd37b741d057%3A0xcdee88e47393c3f1!2sElection%20Commission%20of%20India!5e0!3m2!1sen!2sin!4v1714600000000!5m2!1sen!2sin"
+          width="100%"
+          height="250"
+          style="border:0;border-radius:var(--radius-lg);"
+          allowfullscreen=""
+          loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade"
+          title="Google Maps showing Election Commission of India headquarters in New Delhi"
+          sandbox="allow-scripts allow-same-origin allow-popups"
+        ></iframe>
+      </div>
+
       <div class="footer-bottom">
         <p>Made with ❤️ for Indian Democracy | © ${new Date().getFullYear()} ElectAssist</p>
-        <p>Powered by Google Fonts • Vanilla JS • Vite</p>
+        <p>Powered by Google Fonts · Google Maps · Google Translate · Google Analytics · Firebase Hosting</p>
       </div>
     </div>
   `;
 
-  // Smooth scroll for footer links
-  root.querySelectorAll('a[href^="#"]').forEach(link => {
-    link.addEventListener('click', (e) => {
-      e.preventDefault();
-      const target = document.querySelector(link.getAttribute('href'));
-      if (target) target.scrollIntoView({ behavior: 'smooth' });
-    });
+  // Smooth scroll for footer internal links — event delegation
+  root.addEventListener('click', (e) => {
+    const link = e.target.closest('a[href^="#"]');
+    if (!link) return;
+
+    e.preventDefault();
+    const target = document.querySelector(link.getAttribute('href'));
+    if (target) target.scrollIntoView({ behavior: 'smooth' });
   });
 }

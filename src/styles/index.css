@@ -95,3 +95,64 @@ a:focus-visible{outline:2px solid var(--saffron);outline-offset:2px;border-radiu
   .section{padding:var(--space-16) 0} :root{--container-padding:var(--space-4)}
 }
 @media(max-width:480px){ h1{font-size:var(--text-3xl)} h2{font-size:var(--text-2xl)} .section{padding:var(--space-12) 0} }
+
+/* ===== HIGH CONTRAST MODE ===== */
+[data-contrast="high"] {
+  --bg-primary: #000000;
+  --bg-secondary: #0a0a0a;
+  --bg-card: rgba(30,41,59,0.9);
+  --text-primary: #ffffff;
+  --text-secondary: #e2e8f0;
+  --text-muted: #cbd5e1;
+  --border-color: rgba(255,255,255,0.3);
+  --glass-border: rgba(255,255,255,0.2);
+}
+[data-contrast="high"][data-theme="light"] {
+  --bg-primary: #ffffff;
+  --bg-secondary: #f0f0f0;
+  --bg-card: rgba(255,255,255,0.95);
+  --text-primary: #000000;
+  --text-secondary: #1a1a1a;
+  --text-muted: #333333;
+  --border-color: rgba(0,0,0,0.4);
+}
+
+/* ===== FORCED COLORS (Windows High Contrast Mode) ===== */
+@media (forced-colors: active) {
+  .btn { border: 2px solid ButtonText; }
+  .timeline-node { border: 2px solid LinkText; }
+  .quiz-option { border: 2px solid ButtonText; }
+  .quiz-option.correct { border-color: LinkText; }
+  .quiz-option.wrong { border-color: MarkText; }
+  .faq-question { border: 1px solid ButtonText; }
+  .state-card { border: 1px solid ButtonText; }
+  .chatbot-toggle { border: 2px solid ButtonText; }
+}
+
+/* ===== PREFERS HIGH CONTRAST ===== */
+@media (prefers-contrast: more) {
+  :root {
+    --border-color: rgba(148,163,184,0.4);
+    --glass-border: rgba(148,163,184,0.3);
+  }
+  .btn { font-weight: 700; }
+  .faq-question { font-weight: 700; }
+}
+
+/* ===== GOOGLE TRANSLATE WIDGET ===== */
+#google_translate_element {
+  position: fixed;
+  top: 70px;
+  right: var(--space-6);
+  z-index: var(--z-dropdown);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: var(--space-3);
+  box-shadow: var(--shadow-lg);
+}
+.goog-te-gadget { font-family: var(--font-body) !important; }
+.goog-te-gadget-simple { background: transparent !important; border: none !important; }
+.goog-te-menu-value span { color: var(--text-primary) !important; }
+body > .skiptranslate { display: none !important; }
+body { top: 0 !important; }

@@ -1,9 +1,18 @@
 /**
  * ElectionInsights Component
- * Replaces the map — interactive dashboard with state stats, turnout chart, and milestones
+ * Interactive dashboard with state statistics, voter turnout chart,
+ * and historic milestones of Indian democracy.
+ *
+ * @module components/MapExplorer
  */
 import { announce } from '../utils/accessibility.js';
+import { observeRevealElements } from '../utils/observer.js';
+import { trackEvent } from '../utils/analytics.js';
 
+/**
+ * State-wise election data for the top 12 states by Lok Sabha seats.
+ * @type {Array<{ name: string, seats: number, voters: string, turnout2024: number, icon: string }>}
+ */
 const STATE_DATA = [
   { name: 'Uttar Pradesh', seats: 80, voters: '150M+', turnout2024: 56.89, icon: '🏛️' },
   { name: 'Maharashtra', seats: 48, voters: '96M+', turnout2024: 61.33, icon: '🌆' },
@@ -19,6 +28,10 @@ const STATE_DATA = [
   { name: 'Telangana', seats: 17, voters: '31M+', turnout2024: 65.67, icon: '💎' },
 ];
 
+/**
+ * Historical voter turnout data across general elections.
+ * @type {Array<{ year: string, turnout: number }>}
+ */
 const TURNOUT_HISTORY = [
   { year: '1951', turnout: 44.87 },
   { year: '1962', turnout: 55.42 },
@@ -33,6 +46,10 @@ const TURNOUT_HISTORY = [
   { year: '2024', turnout: 65.79 },
 ];
 
+/**
+ * Key milestones in Indian electoral history.
+ * @type {Array<{ year: string, title: string, desc: string, icon: string }>}
+ */
 const MILESTONES = [
   { year: '1950', title: 'Universal Adult Suffrage', desc: 'India became the first large nation to grant voting rights to all adults from day one — no property or literacy requirements.', icon: '🌟' },
   { year: '1951', title: 'First General Election', desc: '173 million voters, 17,500+ candidates, 196 million ballot papers — the largest democratic experiment ever attempted.', icon: '🗳️' },
@@ -44,8 +61,15 @@ const MILESTONES = [
   { year: '2024', title: 'Largest Election Ever', desc: '968 million eligible voters, 1.05 million polling stations, 5.5 million EVMs — the biggest democratic exercise in history.', icon: '🏆' },
 ];
 
+/** @type {string} Currently active tab */
 let activeFilter = 'all';
 
+/**
+ * Initialize and mount the Election Insights dashboard into #map-root.
+ * Provides tabbed navigation between state stats, turnout chart, and milestones.
+ *
+ * @returns {void}
+ */
 export function initInsights() {
   const root = document.getElementById('map-root');
   if (!root) return;
@@ -53,6 +77,9 @@ export function initInsights() {
   root.className = 'section';
   root.id = 'insights-root';
 
+  /**
+   * Render the insights dashboard with the active tab content.
+   */
   function render() {
     root.innerHTML = `
       <div class="container">
@@ -63,12 +90,19 @@ export function initInsights() {
 
         <!-- Tab Navigation -->
         <div class="insights-tabs" role="tablist" aria-label="Insights categories">
-          <button class="insights-tab ${activeFilter === 'all' ? 'active' : ''}" role="tab" data-tab="all" aria-selected="${activeFilter === 'all'}">📊 State Stats</button>
-          <button class="insights-tab ${activeFilter === 'turnout' ? 'active' : ''}" role="tab" data-tab="turnout" aria-selected="${activeFilter === 'turnout'}">📈 Voter Turnout</button>
-          <button class="insights-tab ${activeFilter === 'milestones' ? 'active' : ''}" role="tab" data-tab="milestones" aria-selected="${activeFilter === 'milestones'}">🏅 Milestones</button>
+          <button class="insights-tab ${activeFilter === 'all' ? 'active' : ''}" role="tab"
+                  data-tab="all" aria-selected="${activeFilter === 'all'}"
+                  id="tab-stats" aria-controls="insights-content" type="button">📊 State Stats</button>
+          <button class="insights-tab ${activeFilter === 'turnout' ? 'active' : ''}" role="tab"
+                  data-tab="turnout" aria-selected="${activeFilter === 'turnout'}"
+                  id="tab-turnout" aria-controls="insights-content" type="button">📈 Voter Turnout</button>
+          <button class="insights-tab ${activeFilter === 'milestones' ? 'active' : ''}" role="tab"
+                  data-tab="milestones" aria-selected="${activeFilter === 'milestones'}"
+                  id="tab-milestones" aria-controls="insights-content" type="button">🏅 Milestones</button>
         </div>
 
-        <div class="insights-content" id="insights-content">
+        <div class="insights-content" id="insights-content" role="tabpanel"
+             aria-labelledby="tab-${activeFilter === 'all' ? 'stats' : activeFilter}">
           ${activeFilter === 'all' ? renderStates() : ''}
           ${activeFilter === 'turnout' ? renderTurnout() : ''}
           ${activeFilter === 'milestones' ? renderMilestones() : ''}
@@ -76,44 +110,43 @@ export function initInsights() {
       </div>
     `;
 
-    // Tab switching
-    root.querySelectorAll('.insights-tab').forEach(tab => {
-      tab.addEventListener('click', () => {
-        activeFilter = tab.dataset.tab;
-        render();
-        announce(`Showing ${tab.textContent.trim()}`);
-      });
+    // Tab switching — event delegation
+    root.querySelector('.insights-tabs').addEventListener('click', (e) => {
+      const tab = e.target.closest('.insights-tab');
+      if (!tab || tab.dataset.tab === activeFilter) return;
+
+      activeFilter = tab.dataset.tab;
+      trackEvent('insights_tab_change', { tab: activeFilter });
+      render();
+      announce(`Showing ${tab.textContent.trim()}`);
     });
 
-    // Animate bars on turnout tab
+    // Animate turnout bars after paint
     if (activeFilter === 'turnout') {
-      setTimeout(() => {
-        root.querySelectorAll('.turnout-bar-fill').forEach(bar => {
-          bar.style.width = bar.dataset.width + '%';
+      requestAnimationFrame(() => {
+        root.querySelectorAll('.turnout-bar-fill').forEach((bar) => {
+          bar.style.width = `${bar.dataset.width}%`;
         });
-      }, 100);
+      });
     }
 
-    // Scroll reveal
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('visible');
-          observer.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.1 });
-    root.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+    // Scroll reveal via shared observer
+    observeRevealElements(root.querySelectorAll('.reveal'));
   }
 
+  /**
+   * Render state statistics cards grid.
+   * @returns {string} HTML string for state cards
+   */
   function renderStates() {
     return `
-      <div class="state-grid">
+      <div class="state-grid" role="list" aria-label="State-wise election statistics">
         ${STATE_DATA.map((s, i) => `
-          <div class="state-card reveal" style="transition-delay:${i * 50}ms" tabindex="0"
-               aria-label="${s.name}: ${s.seats} seats, ${s.voters} voters, ${s.turnout2024}% turnout">
+          <div class="state-card reveal" role="listitem"
+               style="transition-delay:${i * 50}ms" tabindex="0"
+               aria-label="${s.name}: ${s.seats} seats, ${s.voters} voters, ${s.turnout2024}% turnout in 2024">
             <div class="state-card-header">
-              <span class="state-icon">${s.icon}</span>
+              <span class="state-icon" aria-hidden="true">${s.icon}</span>
               <h4>${s.name}</h4>
             </div>
             <div class="state-card-stats">
@@ -130,7 +163,8 @@ export function initInsights() {
                 <span class="state-stat-label">Turnout '24</span>
               </div>
             </div>
-            <div class="state-turnout-bar">
+            <div class="state-turnout-bar" role="meter" aria-label="${s.name} voter turnout"
+                 aria-valuenow="${s.turnout2024}" aria-valuemin="0" aria-valuemax="100">
               <div class="state-turnout-fill" style="width:${s.turnout2024}%;background:${
                 s.turnout2024 >= 70 ? 'var(--success)' : s.turnout2024 >= 60 ? 'var(--saffron)' : 'var(--accent-gold)'
               }"></div>
@@ -138,30 +172,35 @@ export function initInsights() {
           </div>
         `).join('')}
       </div>
-      <p style="text-align:center;font-size:var(--text-xs);color:var(--text-muted);margin-top:var(--space-4)">
+      <p class="insights-footnote">
         Showing top 12 states by Lok Sabha seats. Turnout data approximate from 2024 General Election.
       </p>
     `;
   }
 
+  /**
+   * Render voter turnout bar chart across election years.
+   * @returns {string} HTML string for turnout visualization
+   */
   function renderTurnout() {
     const max = 80;
     return `
-      <div class="turnout-chart reveal visible">
-        <h3 style="margin-bottom:var(--space-6);text-align:center">Voter Turnout Across General Elections</h3>
-        <div class="turnout-bars">
-          ${TURNOUT_HISTORY.map(t => `
-            <div class="turnout-row">
+      <div class="turnout-chart reveal visible" role="img" aria-label="Voter turnout chart across general elections from 1951 to 2024">
+        <h3 class="turnout-chart-title">Voter Turnout Across General Elections</h3>
+        <div class="turnout-bars" role="list">
+          ${TURNOUT_HISTORY.map((t) => `
+            <div class="turnout-row" role="listitem" aria-label="${t.year}: ${t.turnout}% turnout">
               <span class="turnout-year">${t.year}</span>
               <div class="turnout-bar-track">
-                <div class="turnout-bar-fill" data-width="${(t.turnout / max) * 100}" style="width:0%">
+                <div class="turnout-bar-fill" data-width="${(t.turnout / max) * 100}" style="width:0%"
+                     role="meter" aria-valuenow="${t.turnout}" aria-valuemin="0" aria-valuemax="${max}">
                   <span class="turnout-value">${t.turnout}%</span>
                 </div>
               </div>
             </div>
           `).join('')}
         </div>
-        <div style="margin-top:var(--space-6);display:flex;gap:var(--space-6);justify-content:center;flex-wrap:wrap;font-size:var(--text-xs);color:var(--text-muted)">
+        <div class="turnout-legend">
           <span>🟢 70%+ High</span>
           <span>🟠 60-70% Moderate</span>
           <span>🟡 Below 60% Low</span>
@@ -170,13 +209,17 @@ export function initInsights() {
     `;
   }
 
+  /**
+   * Render historical milestones timeline.
+   * @returns {string} HTML string for milestone cards
+   */
   function renderMilestones() {
     return `
-      <div class="milestones-timeline">
+      <div class="milestones-timeline" role="list" aria-label="Historical milestones of Indian elections">
         ${MILESTONES.map((m, i) => `
-          <div class="milestone-card reveal" style="transition-delay:${i * 80}ms">
+          <div class="milestone-card reveal" role="listitem" style="transition-delay:${i * 80}ms">
             <div class="milestone-year-badge">${m.year}</div>
-            <div class="milestone-icon">${m.icon}</div>
+            <div class="milestone-icon" aria-hidden="true">${m.icon}</div>
             <h4>${m.title}</h4>
             <p>${m.desc}</p>
           </div>

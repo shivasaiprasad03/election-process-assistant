@@ -7,6 +7,8 @@ export default defineConfig({
     minify: 'esbuild',
     outDir: 'dist',
     sourcemap: false,
+    target: 'es2020',
+    cssCodeSplit: true,
     rollupOptions: {
       output: {
         manualChunks: {
@@ -24,5 +26,8 @@ export default defineConfig({
         secure: false,
       },
     },
+  },
+  define: {
+    __APP_VERSION__: JSON.stringify('1.0.0'),
   },
 });

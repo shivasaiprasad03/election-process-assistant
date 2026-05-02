@@ -441,3 +441,111 @@
 .chat-message a:hover { color: var(--white); }
 .chat-message b { color: var(--text-primary); }
 .chat-message.bot em { color: var(--text-muted); font-size: 0.9em; }
+
+/* --- Timeline Meta --- */
+.timeline-meta {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  margin-top: var(--space-2);
+  display: block;
+}
+
+/* --- Step Detail Enhancements --- */
+.step-detail-description { margin-bottom: var(--space-6); }
+.step-detail-subtitle { margin-bottom: var(--space-3); }
+.step-detail-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-bottom: var(--space-6);
+}
+.step-detail-list li {
+  padding: var(--space-2) 0;
+  border-bottom: 1px solid var(--border-color);
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+}
+.step-detail-tips {
+  margin-top: var(--space-6);
+  padding: var(--space-4);
+  background: rgba(16,185,129,0.08);
+  border: 1px solid rgba(16,185,129,0.2);
+  border-radius: var(--radius-lg);
+}
+.step-detail-tips h4 { color: var(--success); margin-bottom: var(--space-2); }
+.step-detail-tips p { font-size: var(--text-sm); margin-bottom: var(--space-1); }
+
+/* --- Quiz Feedback --- */
+.quiz-feedback-area { margin-top: var(--space-4); min-height: 60px; }
+.quiz-feedback-card {
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  border: 1px solid;
+}
+.quiz-feedback-correct {
+  background: rgba(16,185,129,0.1);
+  border-color: var(--success);
+}
+.quiz-feedback-correct strong { color: var(--success); }
+.quiz-feedback-wrong {
+  background: rgba(239,68,68,0.1);
+  border-color: var(--error);
+}
+.quiz-feedback-wrong strong { color: var(--error); }
+.quiz-feedback-card p { font-size: var(--text-sm); margin-top: var(--space-1); }
+.quiz-next-btn { margin-top: var(--space-4); }
+.quiz-result-emoji { font-size: 4rem; }
+.quiz-result-actions {
+  margin-top: var(--space-6);
+  display: flex;
+  gap: var(--space-4);
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* --- Insights Footnote --- */
+.insights-footnote {
+  text-align: center;
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  margin-top: var(--space-4);
+}
+
+/* --- Turnout Chart Title --- */
+.turnout-chart-title { margin-bottom: var(--space-6); text-align: center; }
+.turnout-legend {
+  margin-top: var(--space-6);
+  display: flex;
+  gap: var(--space-6);
+  justify-content: center;
+  flex-wrap: wrap;
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+}
+
+/* --- Footer Map --- */
+.footer-map {
+  margin-top: var(--space-8);
+  margin-bottom: var(--space-8);
+  padding: var(--space-4);
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-xl);
+}
+.footer-map-title {
+  font-size: var(--text-sm);
+  color: var(--saffron);
+  margin-bottom: var(--space-4);
+  text-align: center;
+}
+
+/* --- Chatbot Header Layout --- */
+.chatbot-header-info {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.chatbot-header-icon { font-size: 1.4rem; }
+.chatbot-header-status { font-size: 0.7rem; opacity: 0.8; }
+

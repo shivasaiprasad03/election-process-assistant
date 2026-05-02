@@ -1,15 +1,26 @@
 /**
  * Chatbot Component
- * Smart local knowledge-based chat with animated typing, rich responses
- * No API key needed — runs entirely in the browser
+ * Smart local knowledge-based chat with animated typing, rich responses,
+ * rate limiting, and accessibility features.
+ * No API key needed — runs entirely in the browser.
+ *
+ * @module components/Chatbot
  */
 import { encodeHTML } from '../utils/sanitize.js';
 import { announce } from '../utils/accessibility.js';
+import { validateInput, createRateLimiter } from '../utils/security.js';
+import { trackChatEvent } from '../utils/analytics.js';
 
 /* ─── Knowledge Base ─── */
+
+/**
+ * Knowledge base entries — pre-processed for efficient lookup.
+ * Each entry maps lowercase keywords to a rich HTML answer.
+ * @type {Array<{ keys: string[], answer: string }>}
+ */
 const KB = [
   { keys: ['register', 'registration', 'sign up', 'enroll', 'voter id', 'epic', 'nvsp'],
-    answer: `<b>🗳️ Voter Registration</b><br><br>You can register to vote online at <a href="https://nvsp.in" target="_blank" rel="noopener">nvsp.in</a> by filling <b>Form 6</b>. You'll need:<br>
+    answer: `<b>🗳️ Voter Registration</b><br><br>You can register to vote online at <a href="https://nvsp.in" target="_blank" rel="noopener noreferrer">nvsp.in</a> by filling <b>Form 6</b>. You'll need:<br>
 • Proof of age (birth certificate, school certificate, Aadhaar)<br>
 • Proof of address<br>
 • Passport-size photo<br><br>
@@ -67,7 +78,7 @@ Citizens can report violations via the <b>cVIGIL app</b> — complaints are reso
 • Special enrollment drives before elections<br>
 • ~968 million voters registered (2024)<br>
 • 543 Lok Sabha constituencies<br><br>
-Check your name at <a href="https://nvsp.in" target="_blank" rel="noopener">nvsp.in</a> or the Voter Helpline App.` },
+Check your name at <a href="https://nvsp.in" target="_blank" rel="noopener noreferrer">nvsp.in</a> or the Voter Helpline App.` },
 
   { keys: ['announcement', 'schedule', 'election date', 'when election', 'election announce'],
     answer: `<b>📢 Election Announcement</b><br><br>
@@ -121,7 +132,7 @@ Candidates who exceed spending limits can be <b>disqualified</b>. The ECI deploy
 • EVMs are tallied <b>round by round</b><br>
 • VVPAT slips of <b>5 random booths</b> per constituency are verified<br>
 • Results are declared by the Returning Officer<br><br>
-Track live results on <a href="https://results.eci.gov.in" target="_blank" rel="noopener">results.eci.gov.in</a><br><br>
+Track live results on <a href="https://results.eci.gov.in" target="_blank" rel="noopener noreferrer">results.eci.gov.in</a><br><br>
 Counting typically takes <b>12-16 hours</b>. Any candidate can request a recount.` },
 
   { keys: ['government', 'formation', 'prime minister', 'oath', 'majority', '272', 'coalition'],
@@ -206,6 +217,17 @@ Parties must register with ECI and follow election laws. Party symbols are allot
 <em>Just type your question or tap a quick reply!</em>` },
 ];
 
+/**
+ * Pre-computed lowercase keys for faster lookup.
+ * Built once at module load time to avoid repeated toLowerCase() calls.
+ * @type {Array<{ keys: string[], answer: string }>}
+ */
+const KB_INDEXED = KB.map((entry) => ({
+  keys: entry.keys.map((k) => k.toLowerCase()),
+  answer: entry.answer,
+}));
+
+/** Quick reply button suggestions */
 const QUICK_REPLIES = [
   'How do I register?',
   'How does EVM work?',
@@ -216,26 +238,50 @@ const QUICK_REPLIES = [
   'What can you help with?',
 ];
 
+/** Maximum number of messages to keep in DOM for performance */
+const MAX_MESSAGES = 50;
+
+/** Client-side rate limiter — max 15 messages per minute */
+const chatLimiter = createRateLimiter(15, 60000);
+
+/**
+ * Find the best matching answer from the knowledge base.
+ * Uses keyword scoring — longer keyword matches score higher.
+ *
+ * @param {string} query - User's question text
+ * @returns {string} HTML answer string
+ */
 function findAnswer(query) {
   const q = query.toLowerCase().trim();
-  // Greeting
+
+  // Greeting detection
   if (/^(hi|hello|hey|namaste|namaskar)\b/.test(q)) {
     return `<b>🙏 Namaste!</b> I'm your Election Assistant. Ask me anything about the Indian election process — voter registration, EVMs, NOTA, or how the government is formed!<br><br><em>Tip: Try the quick reply buttons below for popular topics.</em>`;
   }
-  // Thank
+
+  // Thank you detection
   if (/^(thank|thanks|dhanyavaad)\b/.test(q)) {
     return `<b>😊 You're welcome!</b> Every informed voter strengthens our democracy. Feel free to ask more questions anytime!<br><br>🗳️ <em>Remember: Your vote is your voice!</em>`;
   }
-  // Search KB
-  let best = null, bestScore = 0;
-  for (const entry of KB) {
+
+  // Score-based keyword matching against pre-indexed KB
+  let best = null;
+  let bestScore = 0;
+
+  for (const entry of KB_INDEXED) {
     let score = 0;
     for (const key of entry.keys) {
       if (q.includes(key)) score += key.length;
     }
-    if (score > bestScore) { bestScore = score; best = entry; }
+    if (score > bestScore) {
+      bestScore = score;
+      best = entry;
+    }
   }
+
   if (best) return best.answer;
+
+  // Fallback response
   return `<b>🤔 Great question!</b><br><br>I'm specialized in Indian elections. I can answer questions about:<br>
 • Voter registration & eligibility<br>
 • EVMs, VVPAT, NOTA<br>
@@ -245,41 +291,48 @@ function findAnswer(query) {
 Try rephrasing or tap one of the quick reply buttons below!`;
 }
 
+/**
+ * Initialize and mount the Chatbot widget into #chatbot-root.
+ * Creates the floating toggle button, chat window with message list,
+ * input field, and quick reply buttons.
+ *
+ * @returns {void}
+ */
 export function initChatbot() {
   const root = document.getElementById('chatbot-root');
   if (!root) return;
 
   root.innerHTML = `
-    <button class="chatbot-toggle" id="chatbot-toggle-btn" aria-label="Open AI chat assistant" title="Ask about elections">
-      <span class="chatbot-toggle-icon">💬</span>
-      <span class="chatbot-pulse"></span>
+    <button class="chatbot-toggle" id="chatbot-toggle-btn" aria-label="Open AI chat assistant" title="Ask about elections" type="button">
+      <span class="chatbot-toggle-icon" aria-hidden="true">💬</span>
+      <span class="chatbot-pulse" aria-hidden="true"></span>
     </button>
-    <div class="chatbot-window" id="chatbot-window" role="dialog" aria-label="Election Assistant">
+    <div class="chatbot-window" id="chatbot-window" role="dialog" aria-modal="false" aria-label="Election Assistant Chat">
       <div class="chatbot-header">
-        <div style="display:flex;align-items:center;gap:var(--space-2)">
-          <span style="font-size:1.4rem">🤖</span>
+        <div class="chatbot-header-info">
+          <span class="chatbot-header-icon" aria-hidden="true">🤖</span>
           <div>
             <h4>Election Assistant</h4>
-            <span style="font-size:0.7rem;opacity:0.8">Always online · No API key needed</span>
+            <span class="chatbot-header-status">Always online · No API key needed</span>
           </div>
         </div>
-        <button class="chatbot-close" id="chatbot-close" aria-label="Close chat">✕</button>
+        <button class="chatbot-close" id="chatbot-close" aria-label="Close chat" type="button">✕</button>
       </div>
-      <div class="chatbot-messages" id="chat-messages" aria-live="polite">
+      <div class="chatbot-messages" id="chat-messages" aria-live="polite" aria-label="Chat messages">
         <div class="chat-message bot">
           <b>🙏 Namaste!</b> I'm your Election Assistant.<br><br>
           Ask me anything about the Indian election process — voter registration, EVMs, VVPAT, NOTA, or how the government is formed!<br><br>
           <em>💡 Tap a quick reply or type your question below.</em>
         </div>
       </div>
-      <div class="chat-quick-replies" id="chat-quick-replies">
-        ${QUICK_REPLIES.map(q => `<button class="quick-reply" data-question="${encodeHTML(q)}">${q}</button>`).join('')}
+      <div class="chat-quick-replies" id="chat-quick-replies" role="group" aria-label="Quick reply suggestions">
+        ${QUICK_REPLIES.map((q) => `<button class="quick-reply" data-question="${encodeHTML(q)}" type="button">${q}</button>`).join('')}
       </div>
       <div class="chatbot-input-area">
         <input type="text" class="chatbot-input" id="chat-input"
                placeholder="Ask about elections..." aria-label="Type your question"
                maxlength="500" autocomplete="off" />
-        <button class="chatbot-send" id="chat-send" aria-label="Send message">➤</button>
+        <button class="chatbot-send" id="chat-send" aria-label="Send message" type="button">➤</button>
       </div>
     </div>
   `;
@@ -291,57 +344,118 @@ export function initChatbot() {
   const input = document.getElementById('chat-input');
   const sendBtn = document.getElementById('chat-send');
 
+  /** @type {number} Track total messages for DOM cleanup */
+  let messageCount = 1; // Start at 1 for the welcome message
+
   toggleBtn.addEventListener('click', () => {
     chatWindow.classList.toggle('open');
     toggleBtn.style.display = chatWindow.classList.contains('open') ? 'none' : 'flex';
-    if (chatWindow.classList.contains('open')) input.focus();
+    if (chatWindow.classList.contains('open')) {
+      input.focus();
+      trackChatEvent('open');
+    }
   });
 
   closeBtn.addEventListener('click', () => {
     chatWindow.classList.remove('open');
     toggleBtn.style.display = 'flex';
+    trackChatEvent('close');
   });
 
+  /**
+   * Send a message and get a response.
+   * Validates input, applies rate limiting, and displays the response.
+   *
+   * @param {string} text - Raw message text from user
+   * @returns {Promise<void>}
+   */
   async function sendMessage(text) {
-    if (!text.trim()) return;
-    const clean = text.trim().slice(0, 500);
+    const clean = validateInput(text, 500);
+    if (!clean) return;
+
+    // Client-side rate limiting
+    if (!chatLimiter.canProceed()) {
+      addMessage('bot', '<b>⏳ Slow down!</b> Please wait a moment before sending more messages.');
+      return;
+    }
 
     addMessage('user', encodeHTML(clean));
     input.value = '';
 
+    trackChatEvent('message', { query_length: clean.length });
+
     // Simulate typing delay for natural feel
     const typingEl = showTyping();
     const delay = 400 + Math.random() * 800;
-    await new Promise(r => setTimeout(r, delay));
+    await new Promise((r) => setTimeout(r, delay));
     typingEl.remove();
 
     const reply = findAnswer(clean);
     addMessage('bot', reply);
   }
 
+  /**
+   * Add a message to the chat window.
+   * Enforces maximum message count for DOM performance.
+   *
+   * @param {'user'|'bot'} type - Message sender type
+   * @param {string} html - HTML content to display
+   */
   function addMessage(type, html) {
     const div = document.createElement('div');
     div.className = `chat-message ${type}`;
     div.innerHTML = html;
     messages.appendChild(div);
     messages.scrollTop = messages.scrollHeight;
-    if (type === 'bot') announce('Assistant replied');
+    messageCount++;
+
+    // Remove oldest messages if exceeding limit (keep DOM lean)
+    while (messageCount > MAX_MESSAGES) {
+      const first = messages.querySelector('.chat-message');
+      if (first) {
+        first.remove();
+        messageCount--;
+      } else {
+        break;
+      }
+    }
+
+    if (type === 'bot') {
+      announce('Assistant replied');
+    }
   }
 
+  /**
+   * Show a typing indicator in the chat.
+   *
+   * @returns {HTMLElement} The typing indicator element (for removal)
+   */
   function showTyping() {
     const div = document.createElement('div');
     div.className = 'typing-indicator';
+    div.setAttribute('role', 'status');
+    div.setAttribute('aria-label', 'Assistant is typing');
     div.innerHTML = '<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>';
     messages.appendChild(div);
     messages.scrollTop = messages.scrollHeight;
     return div;
   }
 
+  // --- Event listeners ---
   sendBtn.addEventListener('click', () => sendMessage(input.value));
-  input.addEventListener('keydown', (e) => { if (e.key === 'Enter') sendMessage(input.value); });
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') sendMessage(input.value);
+  });
 
+  // Event delegation for quick replies
   document.getElementById('chat-quick-replies').addEventListener('click', (e) => {
     const btn = e.target.closest('.quick-reply');
-    if (btn) sendMessage(btn.dataset.question);
+    if (btn) {
+      trackChatEvent('quick_reply', { question: btn.dataset.question });
+      sendMessage(btn.dataset.question);
+    }
   });
 }
+
+// Export findAnswer for testing
+export { findAnswer };

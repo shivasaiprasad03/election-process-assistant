@@ -1,9 +1,21 @@
 /**
  * FAQ Component
- * Accessible accordion with smooth expand/collapse
+ * Accessible accordion with smooth expand/collapse animations.
+ * Uses shared IntersectionObserver for scroll-reveal effects.
+ *
+ * @module components/FAQ
  */
 import { faqData } from '../data/electionData.js';
+import { observeRevealElements } from '../utils/observer.js';
+import { trackFAQEvent } from '../utils/analytics.js';
 
+/**
+ * Initialize and mount the FAQ accordion into #faq-root.
+ * Renders all FAQ items and sets up toggle behavior with
+ * proper ARIA state management and single-open constraint.
+ *
+ * @returns {void}
+ */
 export function initFAQ() {
   const root = document.getElementById('faq-root');
   if (!root) return;
@@ -15,10 +27,11 @@ export function initFAQ() {
         <h2>Frequently Asked Questions</h2>
         <p>Quick answers to the most common questions about voting and elections in India.</p>
       </div>
-      <div class="faq-list" role="list">
+      <div class="faq-list" role="list" aria-label="Frequently asked questions about Indian elections">
         ${faqData.map((item, i) => `
           <div class="faq-item reveal" role="listitem" style="transition-delay:${i * 80}ms">
-            <button class="faq-question" aria-expanded="false" aria-controls="faq-answer-${i}" id="faq-btn-${i}">
+            <button class="faq-question" aria-expanded="false" aria-controls="faq-answer-${i}"
+                    id="faq-btn-${i}" type="button">
               <span>${item.question}</span>
               <span class="faq-icon" aria-hidden="true">+</span>
             </button>
@@ -33,43 +46,37 @@ export function initFAQ() {
     </div>
   `;
 
-  // Accordion toggle
-  root.querySelectorAll('.faq-question').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const item = btn.closest('.faq-item');
-      const answer = item.querySelector('.faq-answer');
-      const isOpen = item.classList.contains('open');
+  // Accordion toggle — event delegation on the FAQ list
+  root.querySelector('.faq-list').addEventListener('click', (e) => {
+    const btn = e.target.closest('.faq-question');
+    if (!btn) return;
 
-      // Close all others
-      root.querySelectorAll('.faq-item.open').forEach(openItem => {
-        if (openItem !== item) {
-          openItem.classList.remove('open');
-          openItem.querySelector('.faq-question').setAttribute('aria-expanded', 'false');
-          openItem.querySelector('.faq-answer').style.maxHeight = '0';
-        }
-      });
+    const item = btn.closest('.faq-item');
+    const answer = item.querySelector('.faq-answer');
+    const isOpen = item.classList.contains('open');
 
-      if (isOpen) {
-        item.classList.remove('open');
-        btn.setAttribute('aria-expanded', 'false');
-        answer.style.maxHeight = '0';
-      } else {
-        item.classList.add('open');
-        btn.setAttribute('aria-expanded', 'true');
-        answer.style.maxHeight = answer.scrollHeight + 'px';
+    // Close all other open items (single-open accordion)
+    root.querySelectorAll('.faq-item.open').forEach((openItem) => {
+      if (openItem !== item) {
+        openItem.classList.remove('open');
+        openItem.querySelector('.faq-question').setAttribute('aria-expanded', 'false');
+        openItem.querySelector('.faq-answer').style.maxHeight = '0';
       }
     });
+
+    if (isOpen) {
+      item.classList.remove('open');
+      btn.setAttribute('aria-expanded', 'false');
+      answer.style.maxHeight = '0';
+      trackFAQEvent('collapse', { question_index: parseInt(btn.id.split('-')[2], 10) });
+    } else {
+      item.classList.add('open');
+      btn.setAttribute('aria-expanded', 'true');
+      answer.style.maxHeight = `${answer.scrollHeight}px`;
+      trackFAQEvent('expand', { question_index: parseInt(btn.id.split('-')[2], 10) });
+    }
   });
 
-  // Scroll reveal
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('visible');
-        observer.unobserve(entry.target);
-      }
-    });
-  }, { threshold: 0.1 });
-
-  root.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+  // Scroll reveal via shared observer
+  observeRevealElements(root.querySelectorAll('.reveal'));
 }

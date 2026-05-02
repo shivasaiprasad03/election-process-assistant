@@ -1,12 +1,22 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" dir="ltr">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content="An interactive guide to understanding the Indian election process — from voter registration to government formation. Powered by AI." />
-  <meta name="keywords" content="Indian elections, voting process, democracy, election guide, Lok Sabha, ECI" />
+  <meta name="keywords" content="Indian elections, voting process, democracy, election guide, Lok Sabha, ECI, voter registration, EVM, VVPAT" />
   <meta name="author" content="Election Process Assistant" />
   <meta name="theme-color" content="#0f172a" />
+  <meta name="color-scheme" content="dark light" />
+  <meta name="robots" content="index, follow" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+  <!-- Open Graph / Social Sharing -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Election Process Assistant — Understand Your Vote" />
+  <meta property="og:description" content="Interactive guide to the Indian election process with timelines, quizzes, and smart Q&A." />
+  <meta property="og:url" content="https://election-assistent-27694.web.app/" />
+  <meta property="og:locale" content="en_IN" />
 
   <title>Election Process Assistant — Understand Your Vote</title>
 
@@ -15,21 +25,77 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 
-  <!-- Structured Data (JSON-LD) -->
+  <!-- Google Translate -->
+  <meta name="google" content="notranslate" />
+
+  <!-- Structured Data (JSON-LD) — Enhanced for richer search results -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
     "@type": "WebApplication",
     "name": "Election Process Assistant",
-    "description": "An interactive guide to understanding the Indian election process",
-    "url": "https://election-assistant.example.com",
+    "description": "An interactive guide to understanding the Indian election process — from voter registration to government formation",
+    "url": "https://election-assistent-27694.web.app/",
     "applicationCategory": "EducationalApplication",
     "operatingSystem": "Web",
+    "inLanguage": ["en", "hi", "ta", "te", "bn", "mr", "gu", "kn", "ml", "pa"],
+    "audience": {
+      "@type": "EducationalAudience",
+      "educationalRole": "voter",
+      "audienceType": "Indian citizens"
+    },
     "offers": {
       "@type": "Offer",
       "price": "0",
       "priceCurrency": "INR"
-    }
+    },
+    "creator": {
+      "@type": "Organization",
+      "name": "ElectAssist"
+    },
+    "featureList": [
+      "Interactive 7-stage election timeline",
+      "AI-powered chatbot assistant",
+      "Election knowledge quiz",
+      "State-wise election statistics",
+      "Multi-language support via Google Translate",
+      "Dark/Light mode",
+      "Fully accessible (WCAG AA)"
+    ]
+  }
+  </script>
+
+  <!-- FAQ Structured Data for Google rich results -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "How do I register to vote in India?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Visit the National Voters' Service Portal (NVSP) at nvsp.in and fill Form 6. You'll need proof of age and address."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is the minimum voting age in India?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The minimum voting age in India is 18 years, as per the 61st Constitutional Amendment of 1988."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is NOTA in Indian elections?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "NOTA (None of the Above) allows voters to reject all candidates. It was introduced in 2013 following a Supreme Court directive."
+        }
+      }
+    ]
   }
   </script>
 
@@ -48,24 +114,24 @@
     <header id="header-root"></header>
 
     <!-- Main Content -->
-    <main id="main-content" role="main">
+    <main id="main-content" role="main" aria-label="Election Process Guide">
       <!-- Hero Section -->
-      <section id="hero-root"></section>
+      <section id="hero-root" aria-label="Welcome"></section>
 
       <!-- Timeline Section -->
-      <section id="timeline-root"></section>
+      <section id="timeline-root" aria-label="Election process timeline"></section>
 
       <!-- Step Detail Modal -->
       <div id="step-detail-root"></div>
 
       <!-- Quiz Section -->
-      <section id="quiz-root"></section>
+      <section id="quiz-root" aria-label="Election knowledge quiz"></section>
 
       <!-- Map Explorer Section -->
-      <section id="map-root"></section>
+      <section id="map-root" aria-label="Election insights dashboard"></section>
 
       <!-- FAQ Section -->
-      <section id="faq-root"></section>
+      <section id="faq-root" aria-label="Frequently asked questions"></section>
     </main>
 
     <!-- Footer -->
@@ -77,6 +143,22 @@
 
   <!-- ARIA Live Region for dynamic announcements -->
   <div id="aria-live" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+
+  <!-- Google Translate Element -->
+  <div id="google_translate_element" style="display:none"></div>
+
+  <!-- Google Translate Script -->
+  <script type="text/javascript">
+    function googleTranslateElementInit() {
+      new google.translate.TranslateElement({
+        pageLanguage: 'en',
+        includedLanguages: 'en,hi,ta,te,bn,mr,gu,kn,ml,pa,ur,as,or,ne',
+        layout: google.translate.TranslateElement.InlineLayout.HORIZONTAL,
+        autoDisplay: false
+      }, 'google_translate_element');
+    }
+  </script>
+  <script type="text/javascript" src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 
   <!-- App Entry Point -->
   <script type="module" src="/src/main.js"></script>

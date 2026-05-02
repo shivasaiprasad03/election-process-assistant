@@ -9,16 +9,25 @@
     "dev:server": "node server/server.js",
     "build": "vite build",
     "preview": "vite preview",
-    "start": "node server/server.js"
+    "start": "node server/server.js",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "lint": "eslint src/ server/ tests/"
   },
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^4.21.2",
+    "express-rate-limit": "^7.5.0",
     "helmet": "^8.0.0",
     "dompurify": "^3.2.4"
   },
   "devDependencies": {
     "concurrently": "^9.1.2",
+    "eslint": "^9.0.0",
+    "vitest": "^3.1.0",
+    "@vitest/coverage-v8": "^3.1.0",
+    "jsdom": "^26.1.0",
     "vite": "^6.3.4"
   },
   "keywords": [
@@ -27,7 +36,9 @@
     "voting",
     "india",
     "civic-education",
-    "interactive"
+    "interactive",
+    "google-services",
+    "accessible"
   ],
   "license": "MIT"
 }

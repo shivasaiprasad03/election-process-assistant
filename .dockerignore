@@ -1,7 +1,44 @@
+# Dependencies (rebuilt in container)
 node_modules
-npm-debug.log
+
+# Source control
 .git
 .gitignore
+
+# Environment files
 server/.env
+.env
+.env.local
+.env.production
+
+# Documentation
 *.md
-.gemini
+
+# Tests (not needed in production image)
+tests/
+vitest.config.js
+coverage/
+
+# IDE / Editor
+.vscode/
+.idea/
+
+# AI / Agent tools
+.agents/
+.claude/
+.windsurf/
+.gemini/
+skills-lock.json
+
+# Firebase config (not needed in Docker)
+.firebase/
+.firebaserc
+firebase.json
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
