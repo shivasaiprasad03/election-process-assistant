@@ -2,6 +2,8 @@
 
 An interactive, accessible web application that helps users understand the Indian election process through an engaging timeline, smart Q&A, and rich visual experiences.
 
+Live site: https://election-assistent-27694.web.app/
+
 ![License](https://img.shields.io/badge/License-MIT-green)
 ![No API Key](https://img.shields.io/badge/API%20Key-Not%20Required-brightgreen)
 
