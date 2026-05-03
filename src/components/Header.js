@@ -8,6 +8,7 @@
 import { initHighContrastMode, toggleHighContrast, getSavedFontSize, saveFontSize } from '../utils/accessibility.js';
 import { safeGetStorage, safeSetStorage } from '../utils/security.js';
 import { trackA11yEvent } from '../utils/analytics.js';
+import { onEscape } from '../utils/accessibility.js';
 import { throttle } from '../utils/observer.js';
 
 /**
@@ -25,7 +26,7 @@ export function initHeader() {
   root.setAttribute('role', 'banner');
   root.innerHTML = `
     <div class="header-inner">
-      <a href="#" class="header-logo" aria-label="Election Process Assistant — Home" id="header-logo">
+      <a href="#hero-root" class="header-logo" aria-label="Election Process Assistant — Home" id="header-logo" data-nav>
         <span class="logo-icon" aria-hidden="true">🗳️</span>
         <span>ElectAssist</span>
       </a>
@@ -37,19 +38,19 @@ export function initHeader() {
         <a href="#faq-root" data-nav>FAQ</a>
       </nav>
       <div class="header-controls">
-        <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark/light theme" title="Toggle theme">
+        <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Toggle dark/light theme" aria-pressed="false" title="Toggle theme">
           <span id="theme-icon" aria-hidden="true">🌙</span>
         </button>
-        <button class="a11y-toggle" id="contrast-toggle" aria-label="Toggle high contrast mode" title="High contrast">
+        <button class="a11y-toggle" id="contrast-toggle" type="button" aria-label="Toggle high contrast mode" aria-pressed="false" title="High contrast">
           <span aria-hidden="true">◐</span>
         </button>
-        <button class="a11y-toggle" id="font-size-toggle" aria-label="Increase font size" title="Increase font size">
+        <button class="a11y-toggle" id="font-size-toggle" type="button" aria-label="Increase font size" title="Increase font size">
           <span aria-hidden="true">A+</span>
         </button>
-        <button class="a11y-toggle" id="translate-toggle" aria-label="Translate page to other languages" title="Translate">
+        <button class="a11y-toggle" id="translate-toggle" type="button" aria-label="Translate page to other languages" aria-expanded="false" aria-controls="google_translate_element" title="Translate">
           <span aria-hidden="true">🌐</span>
         </button>
-        <button class="hamburger" id="hamburger" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-nav">
+        <button class="hamburger" id="hamburger" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-nav">
           <span></span><span></span><span></span>
         </button>
       </div>
@@ -90,19 +91,25 @@ export function initHeader() {
   document.documentElement.setAttribute('data-theme', savedTheme);
   themeIcon.textContent = savedTheme === 'light' ? '☀️' : '🌙';
 
+  themeBtn.setAttribute('aria-pressed', savedTheme === 'light' ? 'true' : 'false');
+
   themeBtn.addEventListener('click', () => {
     const current = document.documentElement.getAttribute('data-theme');
     const next = current === 'dark' ? 'light' : 'dark';
     document.documentElement.setAttribute('data-theme', next);
     safeSetStorage('theme', next);
     themeIcon.textContent = next === 'light' ? '☀️' : '🌙';
+    themeBtn.setAttribute('aria-pressed', next === 'light' ? 'true' : 'false');
     trackA11yEvent('theme_toggle', { theme: next });
   });
 
   // --- High contrast toggle ---
   initHighContrastMode();
-  document.getElementById('contrast-toggle').addEventListener('click', () => {
+  const contrastBtn = document.getElementById('contrast-toggle');
+  contrastBtn.setAttribute('aria-pressed', document.documentElement.getAttribute('data-contrast') === 'high' ? 'true' : 'false');
+  contrastBtn.addEventListener('click', () => {
     const isActive = toggleHighContrast();
+    contrastBtn.setAttribute('aria-pressed', isActive ? 'true' : 'false');
     trackA11yEvent('high_contrast', { enabled: isActive });
   });
 
@@ -119,12 +126,15 @@ export function initHeader() {
   });
 
   // --- Google Translate trigger ---
-  document.getElementById('translate-toggle').addEventListener('click', () => {
+  const translateBtn = document.getElementById('translate-toggle');
+  translateBtn.addEventListener('click', () => {
     const translateEl = document.getElementById('google_translate_element');
     if (translateEl) {
-      translateEl.style.display = translateEl.style.display === 'none' ? 'block' : 'none';
+      const isHidden = translateEl.style.display === 'none' || !translateEl.style.display;
+      translateEl.style.display = isHidden ? 'block' : 'none';
+      translateBtn.setAttribute('aria-expanded', isHidden ? 'true' : 'false');
       // Focus the translate dropdown if visible
-      if (translateEl.style.display === 'block') {
+      if (isHidden) {
         const select = translateEl.querySelector('select');
         if (select) select.focus();
       }
@@ -146,6 +156,7 @@ export function initHeader() {
     hamburger.setAttribute('aria-expanded', 'false');
     mobileNav.classList.remove('open');
     overlay.classList.remove('open');
+    document.documentElement.style.overflow = '';
   }
 
   hamburger.addEventListener('click', () => {
@@ -157,8 +168,15 @@ export function initHeader() {
       hamburger.setAttribute('aria-expanded', 'true');
       mobileNav.classList.add('open');
       overlay.classList.add('open');
+      document.documentElement.style.overflow = 'hidden';
     }
   });
 
   overlay.addEventListener('click', closeMobileNav);
+
+  onEscape(() => {
+    if (mobileNav.classList.contains('open')) {
+      closeMobileNav();
+    }
+  });
 }

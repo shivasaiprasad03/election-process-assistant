@@ -78,6 +78,13 @@ function safeInit(name, initFn) {
  * @returns {void}
  */
 function initScrollReveal() {
+  if (!('IntersectionObserver' in window) || !('MutationObserver' in window)) {
+    document.querySelectorAll('#hero-root .reveal, .reveal').forEach((el) => {
+      el.classList.add('visible');
+    });
+    return;
+  }
+
   const observer = new IntersectionObserver((entries) => {
     entries.forEach((entry) => {
       if (entry.isIntersecting) {

@@ -7,15 +7,40 @@
  */
 
 /**
- * Google Analytics Measurement ID.
- * Set via environment or replace this placeholder with your GA4 ID.
- * Format: 'G-XXXXXXXXXX'
+ * Google Analytics Measurement ID fallback.
+ * Prefer a runtime override or Vite environment value before this placeholder.
  * @type {string}
  */
-const GA_ID = 'G-PLACEHOLDER';
+const FALLBACK_GA_ID = 'G-PLACEHOLDER';
 
 /** @type {boolean} Whether analytics has been initialized */
 let isInitialized = false;
+
+/**
+ * Resolve the Google Analytics measurement ID from the most specific source.
+ * Supports a runtime global override for production deployments and tests.
+ *
+ * @returns {string} Measurement ID or an empty string if analytics should stay disabled
+ */
+export function getMeasurementId() {
+  const runtimeOverride = globalThis.__GA_MEASUREMENT_ID__;
+  const envOverride = typeof import.meta !== 'undefined' ? import.meta.env?.VITE_GA_MEASUREMENT_ID : undefined;
+  return (runtimeOverride || envOverride || FALLBACK_GA_ID || '').trim();
+}
+
+/**
+ * Reset analytics state for tests or hot reload scenarios.
+ *
+ * @returns {void}
+ */
+export function resetAnalyticsState() {
+  isInitialized = false;
+  if (typeof window !== 'undefined') {
+    delete window.gtag;
+    delete window.dataLayer;
+  }
+  document.getElementById('ga4-gtag-script')?.remove();
+}
 
 /**
  * Initialize Google Analytics (only if GA_ID is set and DNT is not enabled).
@@ -24,7 +49,9 @@ let isInitialized = false;
  * @returns {void}
  */
 export function initAnalytics() {
-  if (!GA_ID || GA_ID === 'G-PLACEHOLDER') {
+  const GA_ID = getMeasurementId();
+
+  if (!GA_ID || GA_ID === FALLBACK_GA_ID) {
     console.log('[Analytics] No GA measurement ID configured — analytics disabled.');
     return;
   }
@@ -36,7 +63,13 @@ export function initAnalytics() {
   }
 
   try {
+    if (document.getElementById('ga4-gtag-script')) {
+      isInitialized = true;
+      return;
+    }
+
     const script = document.createElement('script');
+    script.id = 'ga4-gtag-script';
     script.async = true;
     script.src = `https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(GA_ID)}`;
     script.onerror = () => {

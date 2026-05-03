@@ -5,12 +5,34 @@
  * @module tests/utils/analytics
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { trackEvent, trackPageView, trackQuizEvent, trackChatEvent, trackA11yEvent, trackFAQEvent } from '../../src/utils/analytics.js';
+import { getMeasurementId, resetAnalyticsState, initAnalytics, trackEvent, trackPageView, trackQuizEvent, trackChatEvent, trackA11yEvent, trackFAQEvent } from '../../src/utils/analytics.js';
 
 describe('Analytics Module', () => {
   beforeEach(() => {
-    // Reset gtag mock
+    resetAnalyticsState();
     window.gtag = undefined;
+    window.dataLayer = undefined;
+    delete globalThis.__GA_MEASUREMENT_ID__;
+  });
+
+  describe('getMeasurementId', () => {
+    it('should prefer a runtime override', () => {
+      globalThis.__GA_MEASUREMENT_ID__ = 'G-TEST12345';
+      expect(getMeasurementId()).toBe('G-TEST12345');
+    });
+  });
+
+  describe('initAnalytics', () => {
+    it('should initialize once when a measurement id is present', () => {
+      globalThis.__GA_MEASUREMENT_ID__ = 'G-TEST12345';
+
+      expect(() => initAnalytics()).not.toThrow();
+      expect(document.getElementById('ga4-gtag-script')).not.toBeNull();
+
+      const firstScriptCount = document.querySelectorAll('#ga4-gtag-script').length;
+      expect(() => initAnalytics()).not.toThrow();
+      expect(document.querySelectorAll('#ga4-gtag-script').length).toBe(firstScriptCount);
+    });
   });
 
   describe('trackEvent', () => {

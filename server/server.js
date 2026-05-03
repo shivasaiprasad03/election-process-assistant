@@ -19,6 +19,12 @@ const app = express();
 const PORT = parseInt(process.env.PORT, 10) || 3001;
 
 /**
+ * Trust the first proxy hop so rate limiting and IP-based logging work correctly
+ * behind Firebase Hosting or other reverse proxies.
+ */
+app.set('trust proxy', 1);
+
+/**
  * Allowed origins for CORS — restrict to known domains.
  * Add your production domain here.
  * @type {string[]}
@@ -28,6 +34,10 @@ const ALLOWED_ORIGINS = [
   'http://localhost:3001',
   'https://election-assistent-27694.web.app',
   'https://election-assistent-27694.firebaseapp.com',
+  ...((process.env.ALLOWED_ORIGINS || '')
+    .split(',')
+    .map((origin) => origin.trim())
+    .filter(Boolean)),
 ];
 
 // --- Middleware Stack ---

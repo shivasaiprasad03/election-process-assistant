@@ -6,7 +6,7 @@ An interactive, accessible web application that helps users understand the India
 
 ![License](https://img.shields.io/badge/License-MIT-green)
 ![No API Key](https://img.shields.io/badge/API%20Key-Not%20Required-brightgreen)
-![Tests](https://img.shields.io/badge/Tests-101%20passing-brightgreen)
+![Tests](https://img.shields.io/badge/Tests-103%20passing-brightgreen)
 ![Coverage](https://img.shields.io/badge/Coverage-Vitest-blue)
 
 ## ✨ Features
@@ -40,6 +40,7 @@ npm run dev
 ```
 
 The app runs on `http://localhost:5173` (frontend) and `http://localhost:3001` (server).
+For production deployments behind a proxy, you can set `ALLOWED_ORIGINS` as a comma-separated list of trusted origins.
 
 ### Production Build
 
@@ -109,7 +110,7 @@ npm run lint
 | Service | Integration |
 |---|---|
 | **Google Fonts** | Inter + Outfit typefaces with preconnect for fast loading |
-| **Google Analytics 4** | Full event tracking: quiz answers, chat queries, FAQ clicks, scroll depth, theme/a11y usage |
+| **Google Analytics 4** | Full event tracking: quiz answers, chat queries, FAQ clicks, scroll depth, theme/a11y usage; enable with `VITE_GA_MEASUREMENT_ID` or `window.__GA_MEASUREMENT_ID__` |
 | **Google Translate** | In-header language switcher supporting Hindi, Tamil, Telugu, Bengali, Marathi, and 9 more languages |
 | **Google Maps Embed** | Interactive map showing ECI headquarters in the footer |
 | **Firebase Hosting** | Production deployment with CI/CD via GitHub Actions |
@@ -151,7 +152,7 @@ npm run lint
 | `sanitize.test.js` | 18 | XSS prevention, URL validation, truncation |
 | `security.test.js` | 20 | localStorage safety, input validation, rate limiting |
 | `accessibility.test.js` | 10 | ARIA announcements, escape key, reduced motion |
-| `analytics.test.js` | 7 | GA4 safety, event helpers |
+| `analytics.test.js` | 9 | GA4 safety, event helpers, runtime config |
 | `observer.test.js` | 5 | Debounce, throttle utilities |
 | `electionData.test.js` | 20 | Data integrity, required fields, valid values |
 | `Chatbot.test.js` | 21 | KB search, greetings, fallback, case sensitivity |
